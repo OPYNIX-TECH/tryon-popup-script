@@ -1,0 +1,30 @@
+name: Purge jsDelivr Cache
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'opynix-tryon.js'
+  workflow_dispatch:
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Purge jsDelivr CDN Cache
+        run: |
+          echo "Purging jsDelivr edge cache for @main branch..."
+          response=$(curl -s -w "\n%{http_code}" -X GET "https://purge.jsdelivr.net/gh/OPYNIX-TECH/tryon-popup-script@main/opynix-tryon.js")
+          body=$(echo "$response" | head -n -1)
+          http_code=$(echo "$response" | tail -n 1)
+
+          echo "Response HTTP Status: $http_code"
+          echo "Response Body: $body"
+
+          if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+            echo "Successfully purged jsDelivr edge cache!"
+          else
+            echo "Failed to purge jsDelivr cache (HTTP $http_code)"
+            exit 1
+          fi
