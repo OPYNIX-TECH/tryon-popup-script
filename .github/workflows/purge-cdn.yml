@@ -4,8 +4,9 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'opynix-tryon.js'
+      - dev
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 jobs:
@@ -14,8 +15,9 @@ jobs:
     steps:
       - name: Purge jsDelivr CDN Cache
         run: |
-          echo "Purging jsDelivr edge cache for @main branch..."
-          response=$(curl -s -w "\n%{http_code}" -X GET "https://purge.jsdelivr.net/gh/OPYNIX-TECH/tryon-popup-script@main/opynix-tryon.js")
+          REF="${GITHUB_REF_NAME:-dev}"
+          echo "Purging jsDelivr edge cache for @${REF}..."
+          response=$(curl -s -w "\n%{http_code}" -X GET "https://purge.jsdelivr.net/gh/OPYNIX-TECH/tryon-popup-script@${REF}/opynix-tryon.js")
           body=$(echo "$response" | head -n -1)
           http_code=$(echo "$response" | tail -n 1)
 
